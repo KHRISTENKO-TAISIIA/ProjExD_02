@@ -50,26 +50,26 @@ def main():
     kk_rct = kk_img.get_rect()
     kk_rct.center = 900, 400
 
-    bb_img = pg.Surface((20, 20))
-    pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)
-    bb_img.set_colorkey((0, 0, 0))
+    # 爆弾の画像サイズの辞書
+    bb_imgs = []
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_img.set_colorkey((0, 0, 0))
+        bb_imgs.append(bb_img)
     x, y = random.randint(0, 1600), random.randint(0, 900)
-    bb_rct = bb_img.get_rect()
+    bb_rct = bb_imgs[0].get_rect()
     bb_rct.center = (x, y)
     vx, vy = +1, +1
-    tmr = 0
+    accs = [a for a in range(1, 11)]  # 加速度のリスト
 
+    tmr = 0
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return 0
-            
         tmr += 1
-        
-        if kk_rct.colliderect(bb_rct):
-            screen.blit(kk_img, kk_rct)
-            pg.display.update()
-            return
+        screen.blit(bg_img, [0, 0])
 
         key_lst = pg.key.get_pressed()
         # こうかとんの画像方向を選ぶための変数
@@ -86,19 +86,21 @@ def main():
                     kk_rct.move_ip(-mv[0], -mv[1])
         if kk_0 != 0 or kk_1 != 0:  # 飛ぶ方向に従ってこうかとん画像を切り替える
             kk_img = kk_imgs[kk_0, kk_1]
-        screen.blit(bg_img, [0, 0])
-        screen.blit(kk_img, kk_rct) 
-        bb_rct.move_ip(vx, vy) 
-
+        screen.blit(kk_img, kk_rct)
 
         yoko, tate = check_bound(screen.get_rect(), bb_rct)
         if not yoko:
             vx *= -1
         if not tate:
             vy *= -1
+
+        # 時間とともに爆弾が加速する and 大きくなる
+        avx, avy = vx*accs[min(tmr//1000, 9)], vy*accs[min(tmr//1000, 9)]  # 時間とともに爆弾が加速する
+        bb_rct.move_ip(avx, avy)
+        bb_img = bb_imgs[min(tmr//1000, 9)]  # 時間とともに爆弾が大きくなる
         screen.blit(bb_img, bb_rct)
         if kk_rct.colliderect(bb_rct):
-            return 
+            return
 
         pg.display.update()
         clock.tick(1000)
