@@ -71,6 +71,14 @@ def main():
         tmr += 1
         screen.blit(bg_img, [0, 0])
 
+        if kk_rct.colliderect(bb_rct):  # 着弾するとこうかとん画像が切り替わる
+            kk_img_lose_load = pg.image.load("ex02/fig/9.png")
+            kk_img_lose = pg.transform.rotozoom(kk_img_lose_load, 0, 2.0)
+            kk_img = kk_img_lose
+            screen.blit(kk_img, kk_rct)
+            pg.display.update()
+            return
+
         key_lst = pg.key.get_pressed()
         # こうかとんの画像方向を選ぶための変数
         kk_0 = 0
@@ -99,8 +107,6 @@ def main():
         bb_rct.move_ip(avx, avy)
         bb_img = bb_imgs[min(tmr//1000, 9)]  # 時間とともに爆弾が大きくなる
         screen.blit(bb_img, bb_rct)
-        if kk_rct.colliderect(bb_rct):
-            return
 
         pg.display.update()
         clock.tick(1000)
