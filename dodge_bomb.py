@@ -27,6 +27,21 @@ def check_bound(area: pg.Rect, obj: pg.Rect) -> tuple[bool, bool]:
     return yoko, tate
 
 
+def coordinates(org: pg.Rect, dst: pg.Rect, xy: "tuple[float, float]") -> "tuple[float, float]":
+    """
+    爆弾から見て，こうかとんRectがある方向をベクトルとして求める関数
+    引数１：爆弾SurfaceのRect
+    引数２：こうかとんSurfaceのRect
+    戻り値：orgからdst方向ベクトル
+    """
+    a = dst.centerx - org.centerx
+    b = dst.centery - org.centery
+    n = (a**2+b**2)**0.5
+    if n < 500:
+        return xy
+    return a/n*2**0.5, b/n*2**0.5
+
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((1600, 900))
@@ -70,7 +85,7 @@ def main():
                 return 0
         tmr += 1
         screen.blit(bg_img, [0, 0])
-
+        
         if kk_rct.colliderect(bb_rct):  # 着弾するとこうかとん画像が切り替わる
             kk_img_lose_load = pg.image.load("ex02/fig/9.png")
             kk_img_lose = pg.transform.rotozoom(kk_img_lose_load, 0, 2.0)
@@ -102,6 +117,7 @@ def main():
         if not tate:
             vy *= -1
 
+        vx, vy = coordinates(bb_rct, kk_rct, (vx, vy))  # 爆弾がこうかとんに近づくように移動する
         # 時間とともに爆弾が加速する and 大きくなる
         avx, avy = vx*accs[min(tmr//1000, 9)], vy*accs[min(tmr//1000, 9)]  # 時間とともに爆弾が加速する
         bb_rct.move_ip(avx, avy)
