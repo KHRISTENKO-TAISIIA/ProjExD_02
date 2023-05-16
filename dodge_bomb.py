@@ -103,10 +103,12 @@ def main():
                 kk_rct.move_ip(mv)
                 kk_0 = kk_0 + mv[0]
                 kk_1 = kk_1 + mv[1]
+                
         if check_bound(screen.get_rect(), kk_rct) != (True, True):
             for k, mv in delta.items():
                 if key_lst[k]:
                     kk_rct.move_ip(-mv[0], -mv[1])
+
         if kk_0 != 0 or kk_1 != 0:  # 飛ぶ方向に従ってこうかとん画像を切り替える
             kk_img = kk_imgs[kk_0, kk_1]
         screen.blit(kk_img, kk_rct)
